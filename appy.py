@@ -10,7 +10,7 @@ load_dotenv()
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET", "dev-secret")
 # Conexión a MongoDB
-MONGO_URI = os.environ.get("MONGO_URI", "")
+MONGO_URI = os.environ.get("MONGO_URI", "mongodb+srv://peraltabautistaanalicbtis272_db_user:123456789@glamour.ewhyjvm.mongodb.net/glamour-life")
 client = MongoClient(MONGO_URI)
 db = client.get_default_database()
 
@@ -488,4 +488,5 @@ if __name__ == "__main__":
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
     
+
     app.run(debug=True)
