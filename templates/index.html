@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Inicio - Glamour Life{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <h1 class="display-4 fw-bold">BIENVENIDO A GLAMOUR LIFE</h1>
+        <p class="lead">Tu destino para el cuidado personal y la belleza</p>
+        <div class="mt-4">
+            <a href="{{ url_for('products') }}" class="btn btn-light btn-lg me-3">Ver Productos</a>
+            {% if not session.user_id %}
+            <a href="{{ url_for('register') }}" class="btn btn-outline-light btn-lg">Registrarse</a>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<!-- Categorías -->
+<section class="py-5">
+    <div class="container">
+        <h2 class="text-center mb-5">Nuestras Categorías</h2>
+        <div class="row">
+            <div class="col-md-4 mb-4">
+                <div class="card product-card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-palette display-1 text-purple"></i>
+                        <h3 class="card-title mt-3">Maquillaje</h3>
+                        <p class="card-text">Descubre nuestra colección de productos de maquillaje.</p>
+                        <a href="{{ url_for('products', category='makeup') }}" class="btn btn-purple">Explorar</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card product-card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-scissors display-1 text-purple"></i>
+                        <h3 class="card-title mt-3">Cuidado del Cabello</h3>
+                        <p class="card-text">Productos para un cabello saludable y brillante.</p>
+                        <a href="{{ url_for('products', category='hair') }}" class="btn btn-purple">Explorar</a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 mb-4">
+                <div class="card product-card text-center">
+                    <div class="card-body">
+                        <i class="bi bi-droplet display-1 text-purple"></i>
+                        <h3 class="card-title mt-3">Cuidado de la Piel</h3>
+                        <p class="card-text">Rutinas y productos para una piel radiante.</p>
+                        <a href="{{ url_for('products', category='skincare') }}" class="btn btn-purple">Explorar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

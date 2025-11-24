@@ -1,0 +1,146 @@
+:root {
+    --purple: #8a2be2;
+    --pink: #ff69b4;
+    --light-pink: #ffb6c1;
+    --dark-purple: #6a0dad;
+}
+
+.bg-purple {
+    background-color: var(--purple) !important;
+}
+
+.bg-pink {
+    background-color: var(--pink) !important;
+}
+
+.text-purple {
+    color: var(--purple) !important;
+}
+
+.text-pink {
+    color: var(--pink) !important;
+}
+
+.btn-purple {
+    background-color: var(--purple);
+    border-color: var(--purple);
+    color: white;
+}
+
+.btn-purple:hover {
+    background-color: var(--dark-purple);
+    border-color: var(--dark-purple);
+    color: white;
+}
+
+.btn-pink {
+    background-color: var(--pink);
+    border-color: var(--pink);
+    color: white;
+}
+
+.btn-pink:hover {
+    background-color: #e55a9d;
+    border-color: #e55a9d;
+    color: white;
+}
+
+.hero-section {
+    background: linear-gradient(135deg, var(--purple), var(--pink));
+    color: white;
+    padding: 100px 0;
+    text-align: center;
+}
+
+.product-card {
+    transition: transform 0.3s, box-shadow 0.3s;
+    border: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+}
+
+.product-image {
+    height: 200px;
+    object-fit: cover;
+}
+
+.category-badge {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+}
+
+.price {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--purple);
+}
+
+.cart-item {
+    border-bottom: 1px solid #eee;
+    padding: 15px 0;
+}
+
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.quantity-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #ddd;
+    background: white;
+    cursor: pointer;
+}
+
+.quantity-input {
+    width: 50px;
+    text-align: center;
+}
+
+/* Estilos para el carrito flotante */
+.cart-preview {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+}
+
+.cart-preview-btn {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: var(--pink);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    text-decoration: none;
+    position: relative;
+}
+
+.cart-preview-count {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background: var(--purple);
+    color: white;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+}
