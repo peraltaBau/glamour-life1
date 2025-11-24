@@ -9,10 +9,6 @@ load_dotenv()
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("FLASK_SECRET", "dev-secret")
-# Conexión a MongoDB
-MONGO_URI = os.environ.get("MONGO_URI", "mongodb+srv://peraltabautistaanalicbtis272_db_user:123456789@glamour.ewhyjvm.mongodb.net/glamour-life")
-client = MongoClient(MONGO_URI)
-db = client.get_default_database()
 
 # Configuración para subir imágenes
 UPLOAD_FOLDER = 'static/uploads'
@@ -21,7 +17,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max
 
 # Conexión a MongoDB Atlas
-MONGO_URI = os.environ.get("MONGO_URI", "")
+MONGO_URI = os.environ.get("MONGO_URI", "mongodb+srv://peraltabautistaanalicbtis272_db_user:123456789@glamour.ewhyjvm.mongodb.net/glamour-life")
 
 try:
     client = MongoClient(
@@ -47,17 +43,15 @@ except Exception as e:
         db = None
         print("No se pudo conectar con MongoDB Atlas:", e)
 
-# Colecciones
-users_collection = db.users if db else None
-products_collection = db.products if db else None
-orders_collection = db.orders if db else None
+# Colecciones - CORREGIDO: usar verificaciones explícitas con None
+users_collection = db.users if db is not None else None
+products_collection = db.products if db is not None else None
+orders_collection = db.orders if db is not None else None
 
 # Verificar si el archivo es una imagen permitida
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
-
-
 
 # Datos de productos de ejemplo
 sample_products = [
@@ -138,14 +132,17 @@ sample_products = [
     }
 ]
 
-# Insertar productos si no existen
-if db.products.count_documents({}) == 0:
+# Insertar productos si no existen - CORREGIDO
+if db is not None and db.products.count_documents({}) == 0:
     db.products.insert_many(sample_products)
     print("Base de datos poblada con productos de ejemplo")
-else:
+elif db is not None:
     print("La base de datos ya contiene productos")
 
-print(f"Total de productos: {db.products.count_documents({})}")
+if db is not None:
+    print(f"Total de productos: {db.products.count_documents({})}")
+else:
+    print("Base de datos no disponible")
 
 # Rutas principales
 @app.route("/")
@@ -169,6 +166,7 @@ def register():
             flash("Las contraseñas no coinciden.", "danger")
             return redirect(url_for("register"))
 
+        # CORREGIDO: usar 'is not None' en lugar de verificación booleana
         if db is not None:
             # Verificar si el usuario ya existe
             existing_user = users_collection.find_one({"email": email})
@@ -200,6 +198,7 @@ def login():
             flash("Completa todos los campos.", "danger")
             return redirect(url_for("login"))
 
+        # CORREGIDO: usar 'is not None' en lugar de verificación booleana
         if db is not None:
             user = users_collection.find_one({"email": email, "password": password})
             if user:
@@ -224,6 +223,7 @@ def logout():
 def products():
     category = request.args.get('category', 'all')
     
+    # CORREGIDO: usar 'is not None' en lugar de verificación booleana
     if db is not None:
         if category == 'all':
             products_list = list(products_collection.find())
@@ -237,6 +237,7 @@ def products():
 
 @app.route("/product/<id>")
 def product_detail(id):
+    # CORREGIDO: usar 'is None' en lugar de verificación booleana negativa
     if db is None:
         flash("Error: Base de datos no conectada.", "danger")
         return redirect(url_for("products"))
@@ -257,6 +258,7 @@ def add_to_cart():
     product_id = request.form.get("product_id")
     quantity = int(request.form.get("quantity", 1))
     
+    # CORREGIDO: usar 'is not None' en lugar de verificación booleana
     if db is not None:
         product = products_collection.find_one({"_id": ObjectId(product_id)})
         if product:
@@ -366,6 +368,7 @@ def checkout():
     
     if request.method == "POST":
         # Procesar el pago (simulado)
+        # CORREGIDO: usar 'is not None' en lugar de verificación booleana
         if db is not None:
             # Crear orden
             order_data = {
@@ -393,6 +396,7 @@ def checkout():
 # Panel de administración
 @app.route("/admin")
 def admin():
+    # CORREGIDO: usar 'is None' en lugar de verificación booleana negativa
     if db is None:
         flash("Error: Base de datos no conectada.", "danger")
         return redirect(url_for("index"))
@@ -417,6 +421,7 @@ def add_product():
                 file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
                 image_filename = filename
         
+        # CORREGIDO: usar 'is not None' en lugar de verificación booleana
         if db is not None:
             products_collection.insert_one({
                 "name": name,
@@ -434,6 +439,7 @@ def add_product():
 
 @app.route("/admin/edit_product/<id>", methods=["GET", "POST"])
 def edit_product(id):
+    # CORREGIDO: usar 'is None' en lugar de verificación booleana negativa
     if db is None:
         flash("Error: Base de datos no conectada.", "danger")
         return redirect(url_for("admin"))
@@ -475,6 +481,7 @@ def edit_product(id):
 
 @app.route("/admin/delete_product/<id>", methods=["POST"])
 def delete_product(id):
+    # CORREGIDO: usar 'is None' en lugar de verificación booleana negativa
     if db is None:
         flash("Error: Base de datos no conectada.", "danger")
         return redirect(url_for("admin"))
@@ -488,6 +495,4 @@ if __name__ == "__main__":
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
     
-
     app.run(debug=True)
-
