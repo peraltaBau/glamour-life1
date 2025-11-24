@@ -17,7 +17,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max
 
 # Conexión a MongoDB Atlas
-MONGO_URI = os.environ.get("MONGO_URI", "mongodb+srv://peraltabautistaanalicbtis272_db_user:123456789@glamour.ewhyjvm.mongodb.net/glamour-life")
+MONGO_URI = os.environ.get("MONGO_URI", "mongodb+srv://peraltabautistaanalicbtis272_db_user:admin123@glamour.ewhyjvm.mongodb.net/glamour-life1")
 
 try:
     client = MongoClient(
@@ -496,3 +496,4 @@ if __name__ == "__main__":
         os.makedirs(UPLOAD_FOLDER)
     
     app.run(debug=True)
+
