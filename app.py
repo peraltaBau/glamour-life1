@@ -4,6 +4,7 @@ from bson.objectid import ObjectId
 import os
 from werkzeug.utils import secure_filename
 from dotenv import load_dotenv
+import urllib.parse 
 
 load_dotenv()
 
@@ -15,6 +16,9 @@ UPLOAD_FOLDER = 'static/uploads'
 ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg', 'avif'}
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max
+
+if not os.path.exists(UPLOAD_FOLDER):
+    os.makedirs(UPLOAD_FOLDER)
 
 # Conexión a MongoDB Atlas
 MONGO_URI = os.environ.get("MONGO_URI", "mongodb+srv://peraltabautistaanalicbtis272_db_user:admin123@glamour.diwxvux.mongodb.net/glamour-life1")
@@ -53,82 +57,97 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-# Datos de productos de ejemplo
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+# Datos de productos de ejemplo CON IMÁGENES
 sample_products = [
-    # Maquillaje
     {
         "name": "Base de Maquillaje Líquida",
         "description": "Base de cobertura media con acabado natural, ideal para todo tipo de piel.",
         "price": 25.99,
-        "category": "makeup"
+        "category": "makeup",
+        "image": "default_makeup1.jpg"
     },
     {
         "name": "Paleta de Sombras",
         "description": "Paleta con 12 tonos mates y brillantes para crear looks únicos.",
         "price": 32.50,
-        "category": "makeup"
+        "category": "makeup",
+        "image": "default_makeup1.jpg"
     },
     {
         "name": "Labial Líquido Mate",
         "description": "Labial de larga duración con acabado mate y fórmula hidratante.",
         "price": 18.75,
-        "category": "makeup"
+        "category": "makeup",
+        "image": "default_makeup1.jpg"
     },
     {
         "name": "Máscara de Pestañas",
         "description": "Máscara que alarga y volumiza las pestañas sin grumos.",
         "price": 15.25,
-        "category": "makeup"
+        "category": "makeup",
+        "image": "default_makeup1.jpg"
     },
     # Cuidado del Cabello
     {
         "name": "Shampoo Nutritivo",
         "description": "Shampoo con aceites naturales para cabello seco y dañado.",
         "price": 12.99,
-        "category": "hair"
+        "category": "hair",
+        "image": "default_makeup1.jpg"
     },
     {
         "name": "Acondicionador Reparador",
         "description": "Acondicionador que repara puntas abiertas y devuelve el brillo.",
         "price": 14.50,
-        "category": "hair"
+        "category": "hair",
+        "image": "default_makeup1.jpg"
     },
     {
         "name": "Crema para Peinar",
         "description": "Crema que define rizos y controla el frizz sin pesar el cabello.",
         "price": 16.75,
-        "category": "hair"
+        "category": "hair",
+        "image": "default_makeup1.jpg"
     },
     {
         "name": "Aceite Capilar",
         "description": "Aceite nutritivo para tratamiento intensivo antes del lavado.",
         "price": 22.25,
-        "category": "hair"
+        "category": "hair",
+        "image": "default_makeup1.jpg"
     },
     # Cuidado de la Piel
     {
         "name": "Limpiador Facial",
         "description": "Gel limpiador que remueve impurezas sin resecar la piel.",
         "price": 18.99,
-        "category": "skincare"
+        "category": "skincare",
+        "image": "default_makeup1.jpg"
     },
     {
         "name": "Crema Hidratante",
         "description": "Hidratante de textura ligera con protección SPF 30.",
         "price": 28.50,
-        "category": "skincare"
+        "category": "skincare",
+        "image": "default_makeup1.jpg"
     },
     {
         "name": "Serum Vitamina C",
         "description": "Serum antioxidante que ilumina y uniforma el tono de la piel.",
         "price": 35.75,
-        "category": "skincare"
+        "category": "skincare",
+        "image": "default_makeup1.jpg"
     },
     {
         "name": "Mascarilla Facial",
         "description": "Mascarilla de arcilla para purificar y minimizar poros.",
         "price": 12.25,
-        "category": "skincare"
+        "category": "skincare",
+        "image": "default_makeup1.jpg"
     }
 ]
 
@@ -413,15 +432,20 @@ def add_product():
         category = request.form.get("category", "").strip()
         
         # Manejar la imagen
-        image_filename = None
+         image_filename = "default_product.jpg"  # Imagen por defecto
         if 'image' in request.files:
             file = request.files['image']
             if file and file.filename != '' and allowed_file(file.filename):
+                
                 filename = secure_filename(file.filename)
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                image_filename = filename
+                unique_filename = f"{os.path.splitext(filename)[0]}_{ObjectId()}{os.path.splitext(filename)[1]}"
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+                file.save(file_path)
+                image_filename = unique_filename
+                flash("Imagen subida correctamente.", "success")
+            elif file and file.filename != '':
+                flash("Tipo de archivo no permitido.", "danger")
         
-        # CORREGIDO: usar 'is not None' en lugar de verificación booleana
         if db is not None:
             products_collection.insert_one({
                 "name": name,
@@ -436,10 +460,9 @@ def add_product():
             flash("Error: Base de datos no conectada.", "danger")
     
     return render_template("add_product.html")
-
+    
 @app.route("/admin/edit_product/<id>", methods=["GET", "POST"])
 def edit_product(id):
-    # CORREGIDO: usar 'is None' en lugar de verificación booleana negativa
     if db is None:
         flash("Error: Base de datos no conectada.", "danger")
         return redirect(url_for("admin"))
@@ -455,15 +478,25 @@ def edit_product(id):
         price = float(request.form.get("price", 0))
         category = request.form.get("category", "").strip()
         
-        # Manejar la imagen
-        image_filename = product.get('image')
+        # Mantener la imagen actual a menos que se suba una nueva
+        image_filename = product.get('image', 'default_product.jpg')
         if 'image' in request.files:
             file = request.files['image']
             if file and file.filename != '' and allowed_file(file.filename):
+                # Eliminar imagen anterior si no es la por defecto
+                if image_filename != 'default_product.jpg':
+                    old_image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_filename)
+                    if os.path.exists(old_image_path):
+                        os.remove(old_image_path)
+                
+                # Guardar nueva imagen
                 filename = secure_filename(file.filename)
-                file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-                image_filename = filename
-        
+                unique_filename = f"{os.path.splitext(filename)[0]}_{ObjectId()}{os.path.splitext(filename)[1]}"
+                file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+                file.save(file_path)
+                image_filename = unique_filename
+                flash("Imagen actualizada correctamente.", "success")
+
         products_collection.update_one(
             {"_id": ObjectId(id)},
             {"$set": {
@@ -478,6 +511,9 @@ def edit_product(id):
         return redirect(url_for("admin"))
 
     return render_template("edit_product.html", product=product)
+    
+
+
 
 @app.route("/admin/delete_product/<id>", methods=["POST"])
 def delete_product(id):
@@ -496,5 +532,6 @@ if __name__ == "__main__":
         os.makedirs(UPLOAD_FOLDER)
     
     app.run(debug=True)
+
 
 
