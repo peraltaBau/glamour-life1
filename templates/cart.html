@@ -16,11 +16,14 @@
                         <div class="row align-items-center">
                             <div class="col-md-2">
                                 {% if item.image %}
-                                <img src="{{ url_for('static', filename='uploads/' + item.image) }}" 
-                                     class="img-fluid rounded" alt="{{ item.name }}">
+                                <!-- CAMBIO IMPORTANTE AQUÍ -->
+                                <img src="{{ url_for('uploaded_file', filename=item.image) }}" 
+                                     class="img-fluid rounded" alt="{{ item.name }}"
+                                     style="width: 80px; height: 80px; object-fit: cover;">
                                 {% else %}
-                                <img src="https://via.placeholder.com/80x80?text=Sin+Imagen" 
-                                     class="img-fluid rounded" alt="Imagen no disponible">
+                                <img src="https://via.placeholder.com/80x80/cccccc/969696?text=Sin+Imagen" 
+                                     class="img-fluid rounded" alt="Imagen no disponible"
+                                     style="width: 80px; height: 80px; object-fit: cover;">
                                 {% endif %}
                             </div>
                             
