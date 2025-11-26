@@ -437,8 +437,7 @@ def add_product():
         if 'image' in request.files:
             file = request.files['image']
             if file and file.filename != '' and allowed_file(file.filename):
-             
-                
+                # Generar nombre único para evitar colisiones
                 filename = secure_filename(file.filename)
                 unique_filename = f"{os.path.splitext(filename)[0]}_{ObjectId()}{os.path.splitext(filename)[1]}"
                 file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
@@ -462,6 +461,7 @@ def add_product():
             flash("Error: Base de datos no conectada.", "danger")
     
     return render_template("add_product.html")
+    
     
 @app.route("/admin/edit_product/<id>", methods=["GET", "POST"])
 def edit_product(id):
@@ -534,6 +534,7 @@ if __name__ == "__main__":
         os.makedirs(UPLOAD_FOLDER)
     
     app.run(debug=True)
+
 
 
 
