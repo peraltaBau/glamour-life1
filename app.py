@@ -423,6 +423,7 @@ def admin():
     products_list = list(products_collection.find())
     return render_template("admin.html", products=products_list)
 
+# CORRECTO - así debería estar:
 @app.route("/admin/add_product", methods=["GET", "POST"])
 def add_product():
     if request.method == "POST":
@@ -432,10 +433,11 @@ def add_product():
         category = request.form.get("category", "").strip()
         
         # Manejar la imagen
-         image_filename = "default_product.jpg"  # Imagen por defecto
+        image_filename = "default_product.jpg"  # Imagen por defecto
         if 'image' in request.files:
             file = request.files['image']
             if file and file.filename != '' and allowed_file(file.filename):
+             
                 
                 filename = secure_filename(file.filename)
                 unique_filename = f"{os.path.splitext(filename)[0]}_{ObjectId()}{os.path.splitext(filename)[1]}"
@@ -532,6 +534,7 @@ if __name__ == "__main__":
         os.makedirs(UPLOAD_FOLDER)
     
     app.run(debug=True)
+
 
 
 
