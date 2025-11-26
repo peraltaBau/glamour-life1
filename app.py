@@ -68,28 +68,28 @@ sample_products = [
         "description": "Base de cobertura media con acabado natural, ideal para todo tipo de piel.",
         "price": 25.99,
         "category": "makeup",
-        "image": "default_makeup1.jpg"
+        "image": "base de maquillaje.avif"
     },
     {
         "name": "Paleta de Sombras",
         "description": "Paleta con 12 tonos mates y brillantes para crear looks únicos.",
         "price": 32.50,
         "category": "makeup",
-        "image": "default_makeup1.jpg"
+        "image": "Paleta de Sombras.webp"
     },
     {
         "name": "Labial Líquido Mate",
         "description": "Labial de larga duración con acabado mate y fórmula hidratante.",
         "price": 18.75,
         "category": "makeup",
-        "image": "default_makeup1.jpg"
+        "image": "Labial Líquido Mate.webp"
     },
     {
         "name": "Máscara de Pestañas",
         "description": "Máscara que alarga y volumiza las pestañas sin grumos.",
         "price": 15.25,
         "category": "makeup",
-        "image": "default_makeup1.jpg"
+        "image": "Máscara de Pestañas.webp"
     },
     # Cuidado del Cabello
     {
@@ -97,28 +97,28 @@ sample_products = [
         "description": "Shampoo con aceites naturales para cabello seco y dañado.",
         "price": 12.99,
         "category": "hair",
-        "image": "default_makeup1.jpg"
+        "image": "Shampoo Nutritivo.webp"
     },
     {
         "name": "Acondicionador Reparador",
         "description": "Acondicionador que repara puntas abiertas y devuelve el brillo.",
         "price": 14.50,
         "category": "hair",
-        "image": "default_makeup1.jpg"
+        "image": "Acondicionador Reparador.jpg"
     },
     {
         "name": "Crema para Peinar",
         "description": "Crema que define rizos y controla el frizz sin pesar el cabello.",
         "price": 16.75,
         "category": "hair",
-        "image": "default_makeup1.jpg"
+        "image": "Crema para Peinar.jpg"
     },
     {
         "name": "Aceite Capilar",
         "description": "Aceite nutritivo para tratamiento intensivo antes del lavado.",
         "price": 22.25,
         "category": "hair",
-        "image": "default_makeup1.jpg"
+        "image": "Aceite Capilar.jpg"
     },
     # Cuidado de la Piel
     {
@@ -126,28 +126,28 @@ sample_products = [
         "description": "Gel limpiador que remueve impurezas sin resecar la piel.",
         "price": 18.99,
         "category": "skincare",
-        "image": "default_makeup1.jpg"
+        "image": "Limpiador Facial.jpg"
     },
     {
         "name": "Crema Hidratante",
         "description": "Hidratante de textura ligera con protección SPF 30.",
         "price": 28.50,
         "category": "skincare",
-        "image": "default_makeup1.jpg"
+        "image": "Crema Hidratante.jpg"
     },
     {
         "name": "Serum Vitamina C",
         "description": "Serum antioxidante que ilumina y uniforma el tono de la piel.",
         "price": 35.75,
         "category": "skincare",
-        "image": "default_makeup1.jpg"
+        "image": "Serum Vitamina C.jpg"
     },
     {
         "name": "Mascarilla Facial",
         "description": "Mascarilla de arcilla para purificar y minimizar poros.",
         "price": 12.25,
         "category": "skincare",
-        "image": "default_makeup1.jpg"
+        "image": "Mascarilla Facial.jpg"
     }
 ]
 
@@ -532,6 +532,7 @@ if __name__ == "__main__":
         os.makedirs(UPLOAD_FOLDER)
     
     app.run(debug=True)
+
 
 
 
