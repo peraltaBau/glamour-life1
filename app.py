@@ -30,7 +30,7 @@ try:
         tlsAllowInvalidCertificates=False,
         serverSelectionTimeoutMS=10000
     )
-    db = client.get_default_database()
+    db = client['glamour-life1'] 
     print("Conexión segura establecida con MongoDB Atlas")
 except Exception as e:
     print("Conexión segura falló, intentando modo escolar...")
@@ -463,6 +463,13 @@ def add_product():
     return render_template("add_product.html")
     
     
+
+# Ruta para servir archivos subidos - ¡AGREGA ESTA RUTA!
+@app.route('/uploads/<filename>')
+def uploaded_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+
+
 @app.route("/admin/edit_product/<id>", methods=["GET", "POST"])
 def edit_product(id):
     if db is None:
@@ -490,7 +497,8 @@ def edit_product(id):
                     old_image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_filename)
                     if os.path.exists(old_image_path):
                         os.remove(old_image_path)
-                
+
+
                 # Guardar nueva imagen
                 filename = secure_filename(file.filename)
                 unique_filename = f"{os.path.splitext(filename)[0]}_{ObjectId()}{os.path.splitext(filename)[1]}"
@@ -532,13 +540,108 @@ if __name__ == "__main__":
     # Crear directorio de uploads si no existe
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
+
+from PIL import Image, ImageDraw, ImageFont
+
+def crear_imagen_placeholder(nombre_producto, filename, width=300, height=250):
+    """Crea una imagen placeholder bonita para productos"""
+    try:
+        # Crear imagen con gradiente atractivo
+        img = Image.new('RGB', (width, height), color='#667eea')
+        draw = ImageDraw.Draw(img)
+        
+        # Dibujar círculo decorativo
+        draw.ellipse([-50, -50, 150, 150], fill='#764ba2', outline=None)
+        draw.ellipse([200, 150, 350, 300], fill='#764ba2', outline=None)
+        
+        # Texto del producto (dividido en líneas si es muy largo)
+        palabras = nombre_producto.split()
+        line1 = ' '.join(palabras[:len(palabras)//2]) if len(palabras) > 2 else nombre_producto[:15]
+        line2 = ' '.join(palabras[len(palabras)//2:]) if len(palabras) > 2 else nombre_producto[15:30] if len(nombre_producto) > 15 else ''
+        
+        # Intentar usar una fuente, sino usar default
+        try:
+            font_large = ImageFont.truetype("arial.ttf", 20)
+            font_small = ImageFont.truetype("arial.ttf", 16)
+        except:
+            font_large = ImageFont.load_default()
+            font_small = ImageFont.load_default()
+        
+        # Dibujar texto
+        if line2:
+            draw.text((width//2, height//2 - 15), line1, fill='white', font=font_large, anchor='mm')
+            draw.text((width//2, height//2 + 15), line2, fill='white', font=font_small, anchor='mm')
+        else:
+            draw.text((width//2, height//2), line1, fill='white', font=font_large, anchor='mm')
+        
+        # Guardar imagen
+        images_dir = 'static/images'
+        if not os.path.exists(images_dir):
+            os.makedirs(images_dir)
+        
+        path = os.path.join(images_dir, filename)
+        
+        # Determinar formato basado en extensión
+        if filename.lower().endswith('.webp'):
+            img.save(path, 'WEBP', quality=85)
+        elif filename.lower().endswith('.avif'):
+            img.save(path, 'JPEG', quality=85)  # PIL no soporta AVIF, usamos JPEG
+        else:
+            img.save(path, 'JPEG', quality=85)
+            
+        print(f"✅ Imagen creada: {filename}")
+        return True
+    except Exception as e:
+        print(f"❌ Error creando {filename}: {e}")
+        return False
+
+def inicializar_imagenes_productos():
+    """Crea imágenes para todos los productos de ejemplo"""
+    print("🖼️ Inicializando imágenes de productos...")
     
-    app.run(debug=True)
+    # Lista de imágenes que necesitas basada en tus productos
+    imagenes_necesarias = [
+        "base de maquillaje.avif",
+        "Paleta de Sombras.webp", 
+        "Labial Líquido Mate.webp",
+        "Máscara de Pestañas.webp",
+        "Shampoo Nutritivo.webp",
+        "Acondicionador Reparador.jpg",
+        "Crema para Peinar.jpg", 
+        "Aceite Capilar.jpg",
+        "Limpiador Facial.jpg",
+        "Crema Hidratante.jpg",
+        "Serum Vitamina C.jpg",
+        "Mascarilla Facial.jpg"
+    ]
+    
+    # Mapeo de nombres de archivo a nombres de producto
+    mapeo_nombres = {
+        "base de maquillaje.avif": "Base Maquillaje",
+        "Paleta de Sombras.webp": "Paleta Sombras",
+        "Labial Líquido Mate.webp": "Labial Mate", 
+        "Máscara de Pestañas.webp": "Máscara Pestañas",
+        "Shampoo Nutritivo.webp": "Shampoo Nutritivo",
+        "Acondicionador Reparador.jpg": "Acondicionador",
+        "Crema para Peinar.jpg": "Crema Peinar",
+        "Aceite Capilar.jpg": "Aceite Capilar",
+        "Limpiador Facial.jpg": "Limpiador Facial",
+        "Crema Hidratante.jpg": "Crema Hidratante",
+        "Serum Vitamina C.jpg": "Serum Vitamina C",
+        "Mascarilla Facial.jpg": "Mascarilla Facial"
+    }
+    
+    creadas = 0
+    for imagen in imagenes_necesarias:
+        if not os.path.exists(os.path.join('static/images', imagen)):
+            nombre_producto = mapeo_nombres.get(imagen, imagen.replace('.', ' ').title())
+            if crear_imagen_placeholder(nombre_producto, imagen):
+                creadas += 1
+    
+    print(f"📸 Se crearon {creadas} imágenes placeholder")
+    return creadas
 
-
-
-
-
-
-
-
+# Llamar esta función después de definir sample_products pero antes de las rutas
+inicializar_imagenes_productos()
+    
+app.run(debug=True)
