@@ -143,4 +143,28 @@
     align-items: center;
     justify-content: center;
     font-size: 0.8rem;
+
+}
+
+
+.producto-img {
+    width: 100%;
+    height: 250px; /* Altura fija */
+    object-fit: cover; /* ¡IMPORTANTE! Mantiene la proporción */
+    object-position: center;
+    border-radius: 8px;
+}
+
+/* O si prefieres contenedor cuadrado */
+.producto-img-container {
+    width: 100%;
+    height: 250px;
+    overflow: hidden;
+    border-radius: 8px;
+}
+
+.producto-img-container img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
