@@ -163,8 +163,19 @@
     border-radius: 8px;
 }
 
+
+/* Estilo temporal para debug */
+img {
+    border: 2px solid red; /* Para ver los límites */
+    max-width: 100%;
+    height: auto;
+}
+
+
+
 .producto-img-container img {
     width: 100%;
     height: 100%;
     object-fit: cover;
 }
+
