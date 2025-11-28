@@ -20,6 +20,11 @@ app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
+# Crear directorio para imágenes estáticas
+IMAGES_FOLDER = 'static/images'
+if not os.path.exists(IMAGES_FOLDER):
+    os.makedirs(IMAGES_FOLDER)
+
 # Conexión a MongoDB Atlas
 MONGO_URI = os.environ.get("MONGO_URI", "mongodb+srv://peraltabautistaanalicbtis272_db_user:admin123@glamour.diwxvux.mongodb.net/glamour-life1")
 
@@ -61,6 +66,10 @@ def allowed_file(filename):
 def serve_images(filename):
     return send_from_directory('static/img', filename)
 
+@app.route('/static/images/<path:filename>')
+def serve_product_images(filename):
+    return send_from_directory('static/images', filename)
+
 # Datos de productos de ejemplo CON IMÁGENES
 sample_products = [
     {
@@ -68,28 +77,28 @@ sample_products = [
         "description": "Base de cobertura media con acabado natural, ideal para todo tipo de piel.",
         "price": 25.99,
         "category": "makeup",
-        "image": "base de maquillaje.avif"
+        "image": "base_de_maquillaje.jpg"
     },
     {
         "name": "Paleta de Sombras",
         "description": "Paleta con 12 tonos mates y brillantes para crear looks únicos.",
         "price": 32.50,
         "category": "makeup",
-        "image": "Paleta de Sombras.webp"
+        "image": "paleta_de_sombras.jpg"
     },
     {
         "name": "Labial Líquido Mate",
         "description": "Labial de larga duración con acabado mate y fórmula hidratante.",
         "price": 18.75,
         "category": "makeup",
-        "image": "Labial Líquido Mate.webp"
+        "image": "labial_liquido_mate.jpg"
     },
     {
         "name": "Máscara de Pestañas",
         "description": "Máscara que alarga y volumiza las pestañas sin grumos.",
         "price": 15.25,
         "category": "makeup",
-        "image": "Máscara de Pestañas.webp"
+        "image": "mascara_de_pestanas.jpg"
     },
     # Cuidado del Cabello
     {
@@ -97,28 +106,28 @@ sample_products = [
         "description": "Shampoo con aceites naturales para cabello seco y dañado.",
         "price": 12.99,
         "category": "hair",
-        "image": "Shampoo Nutritivo.webp"
+        "image": "shampoo_nutritivo.jpg"
     },
     {
         "name": "Acondicionador Reparador",
         "description": "Acondicionador que repara puntas abiertas y devuelve el brillo.",
         "price": 14.50,
         "category": "hair",
-        "image": "Acondicionador Reparador.jpg"
+        "image": "acondicionador_reparador.jpg"
     },
     {
         "name": "Crema para Peinar",
         "description": "Crema que define rizos y controla el frizz sin pesar el cabello.",
         "price": 16.75,
         "category": "hair",
-        "image": "Crema para Peinar.jpg"
+        "image": "crema_para_peinar.jpg"
     },
     {
         "name": "Aceite Capilar",
         "description": "Aceite nutritivo para tratamiento intensivo antes del lavado.",
         "price": 22.25,
         "category": "hair",
-        "image": "Aceite Capilar.jpg"
+        "image": "aceite_capilar.jpg"
     },
     # Cuidado de la Piel
     {
@@ -126,40 +135,84 @@ sample_products = [
         "description": "Gel limpiador que remueve impurezas sin resecar la piel.",
         "price": 18.99,
         "category": "skincare",
-        "image": "Limpiador Facial.jpg"
+        "image": "limpiador_facial.jpg"
     },
     {
         "name": "Crema Hidratante",
         "description": "Hidratante de textura ligera con protección SPF 30.",
         "price": 28.50,
         "category": "skincare",
-        "image": "Crema Hidratante.jpg"
+        "image": "crema_hidratante.jpg"
     },
     {
         "name": "Serum Vitamina C",
         "description": "Serum antioxidante que ilumina y uniforma el tono de la piel.",
         "price": 35.75,
         "category": "skincare",
-        "image": "Serum Vitamina C.jpg"
+        "image": "serum_vitamina_c.jpg"
     },
     {
         "name": "Mascarilla Facial",
         "description": "Mascarilla de arcilla para purificar y minimizar poros.",
         "price": 12.25,
         "category": "skincare",
-        "image": "Mascarilla Facial.jpg"
+        "image": "mascarilla_facial.jpg"
     }
 ]
 
+def crear_imagen_simple(nombre_producto, filename, width=300, height=250):
+    """Crea una imagen placeholder simple sin dependencias externas"""
+    try:
+        # Solo crear archivos de texto como marcadores de posición
+        # En producción, deberías tener imágenes reales
+        images_dir = 'static/images'
+        if not os.path.exists(images_dir):
+            os.makedirs(images_dir)
+        
+        path = os.path.join(images_dir, filename)
+        
+        # Crear un archivo de texto como placeholder
+        with open(path, 'w') as f:
+            f.write(f"Placeholder para: {nombre_producto}")
+        
+        print(f"✅ Marcador creado: {filename}")
+        return True
+    except Exception as e:
+        print(f"❌ Error creando {filename}: {e}")
+        return False
+
+def inicializar_imagenes_productos():
+    """Crea marcadores para todos los productos de ejemplo"""
+    print("🖼️ Inicializando marcadores de productos...")
+    
+    # Mapeo de nombres de archivo a nombres de producto
+    mapeo_nombres = {}
+    for product in sample_products:
+        mapeo_nombres[product['image']] = product['name']
+    
+    creadas = 0
+    for product in sample_products:
+        imagen = product['image']
+        if not os.path.exists(os.path.join(IMAGES_FOLDER, imagen)):
+            nombre_producto = mapeo_nombres.get(imagen, imagen.replace('.', ' ').title())
+            if crear_imagen_simple(nombre_producto, imagen):
+                creadas += 1
+    
+    print(f"📸 Se crearon {creadas} marcadores de imagen")
+    return creadas
+
+# Inicializar imágenes antes de poblar la base de datos
+inicializar_imagenes_productos()
+
 # Insertar productos si no existen - CORREGIDO
-if db is not None and db.products.count_documents({}) == 0:
-    db.products.insert_many(sample_products)
+if db is not None and products_collection.count_documents({}) == 0:
+    products_collection.insert_many(sample_products)
     print("Base de datos poblada con productos de ejemplo")
 elif db is not None:
     print("La base de datos ya contiene productos")
 
 if db is not None:
-    print(f"Total de productos: {db.products.count_documents({})}")
+    print(f"Total de productos: {products_collection.count_documents({})}")
 else:
     print("Base de datos no disponible")
 
@@ -261,12 +314,16 @@ def product_detail(id):
         flash("Error: Base de datos no conectada.", "danger")
         return redirect(url_for("products"))
     
-    product = products_collection.find_one({"_id": ObjectId(id)})
-    if not product:
-        flash("Producto no encontrado.", "warning")
+    try:
+        product = products_collection.find_one({"_id": ObjectId(id)})
+        if not product:
+            flash("Producto no encontrado.", "warning")
+            return redirect(url_for("products"))
+        
+        return render_template("product_detail.html", product=product)
+    except Exception as e:
+        flash("ID de producto inválido.", "danger")
         return redirect(url_for("products"))
-    
-    return render_template("product_detail.html", product=product)
 
 @app.route("/add_to_cart", methods=["POST"])
 def add_to_cart():
@@ -279,30 +336,33 @@ def add_to_cart():
     
     # CORREGIDO: usar 'is not None' en lugar de verificación booleana
     if db is not None:
-        product = products_collection.find_one({"_id": ObjectId(product_id)})
-        if product:
-            # Inicializar carrito si no existe
-            if 'cart' not in session:
-                session['cart'] = {}
-            
-            cart = session['cart']
-            
-            # Agregar o actualizar producto en el carrito
-            if product_id in cart:
-                cart[product_id]['quantity'] += quantity
+        try:
+            product = products_collection.find_one({"_id": ObjectId(product_id)})
+            if product:
+                # Inicializar carrito si no existe
+                if 'cart' not in session:
+                    session['cart'] = {}
+                
+                cart = session['cart']
+                
+                # Agregar o actualizar producto en el carrito
+                if product_id in cart:
+                    cart[product_id]['quantity'] += quantity
+                else:
+                    cart[product_id] = {
+                        'name': product['name'],
+                        'price': float(product['price']),
+                        'image': product.get('image', ''),
+                        'quantity': quantity
+                    }
+                
+                session['cart'] = cart
+                session.modified = True
+                flash(f"Producto agregado al carrito.", "success")
             else:
-                cart[product_id] = {
-                    'name': product['name'],
-                    'price': product['price'],
-                    'image': product.get('image', ''),
-                    'quantity': quantity
-                }
-            
-            session['cart'] = cart
-            session.modified = True
-            flash(f"Producto agregado al carrito.", "success")
-        else:
-            flash("Producto no encontrado.", "danger")
+                flash("Producto no encontrado.", "danger")
+        except Exception as e:
+            flash("Error al agregar producto al carrito.", "danger")
     else:
         flash("Error: Base de datos no conectada.", "danger")
     
@@ -423,7 +483,6 @@ def admin():
     products_list = list(products_collection.find())
     return render_template("admin.html", products=products_list)
 
-# CORRECTO - así debería estar:
 @app.route("/admin/add_product", methods=["GET", "POST"])
 def add_product():
     if request.method == "POST":
@@ -461,14 +520,11 @@ def add_product():
             flash("Error: Base de datos no conectada.", "danger")
     
     return render_template("add_product.html")
-    
-    
 
-# Ruta para servir archivos subidos - ¡AGREGA ESTA RUTA!
+# Ruta para servir archivos subidos
 @app.route('/uploads/<filename>')
 def uploaded_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
-
 
 @app.route("/admin/edit_product/<id>", methods=["GET", "POST"])
 def edit_product(id):
@@ -476,54 +532,54 @@ def edit_product(id):
         flash("Error: Base de datos no conectada.", "danger")
         return redirect(url_for("admin"))
     
-    product = products_collection.find_one({"_id": ObjectId(id)})
-    if not product:
-        flash("Producto no encontrado.", "warning")
+    try:
+        product = products_collection.find_one({"_id": ObjectId(id)})
+        if not product:
+            flash("Producto no encontrado.", "warning")
+            return redirect(url_for("admin"))
+
+        if request.method == "POST":
+            name = request.form.get("name", "").strip()
+            description = request.form.get("description", "").strip()
+            price = float(request.form.get("price", 0))
+            category = request.form.get("category", "").strip()
+            
+            # Mantener la imagen actual a menos que se suba una nueva
+            image_filename = product.get('image', 'default_product.jpg')
+            if 'image' in request.files:
+                file = request.files['image']
+                if file and file.filename != '' and allowed_file(file.filename):
+                    # Eliminar imagen anterior si no es la por defecto
+                    if image_filename != 'default_product.jpg':
+                        old_image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_filename)
+                        if os.path.exists(old_image_path):
+                            os.remove(old_image_path)
+
+                    # Guardar nueva imagen
+                    filename = secure_filename(file.filename)
+                    unique_filename = f"{os.path.splitext(filename)[0]}_{ObjectId()}{os.path.splitext(filename)[1]}"
+                    file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
+                    file.save(file_path)
+                    image_filename = unique_filename
+                    flash("Imagen actualizada correctamente.", "success")
+
+            products_collection.update_one(
+                {"_id": ObjectId(id)},
+                {"$set": {
+                    "name": name,
+                    "description": description,
+                    "price": price,
+                    "category": category,
+                    "image": image_filename
+                }}
+            )
+            flash("Producto actualizado correctamente.", "success")
+            return redirect(url_for("admin"))
+
+        return render_template("edit_product.html", product=product)
+    except Exception as e:
+        flash("ID de producto inválido.", "danger")
         return redirect(url_for("admin"))
-
-    if request.method == "POST":
-        name = request.form.get("name", "").strip()
-        description = request.form.get("description", "").strip()
-        price = float(request.form.get("price", 0))
-        category = request.form.get("category", "").strip()
-        
-        # Mantener la imagen actual a menos que se suba una nueva
-        image_filename = product.get('image', 'default_product.jpg')
-        if 'image' in request.files:
-            file = request.files['image']
-            if file and file.filename != '' and allowed_file(file.filename):
-                # Eliminar imagen anterior si no es la por defecto
-                if image_filename != 'default_product.jpg':
-                    old_image_path = os.path.join(app.config['UPLOAD_FOLDER'], image_filename)
-                    if os.path.exists(old_image_path):
-                        os.remove(old_image_path)
-
-
-                # Guardar nueva imagen
-                filename = secure_filename(file.filename)
-                unique_filename = f"{os.path.splitext(filename)[0]}_{ObjectId()}{os.path.splitext(filename)[1]}"
-                file_path = os.path.join(app.config['UPLOAD_FOLDER'], unique_filename)
-                file.save(file_path)
-                image_filename = unique_filename
-                flash("Imagen actualizada correctamente.", "success")
-
-        products_collection.update_one(
-            {"_id": ObjectId(id)},
-            {"$set": {
-                "name": name,
-                "description": description,
-                "price": price,
-                "category": category,
-                "image": image_filename
-            }}
-        )
-        flash("Producto actualizado correctamente.", "success")
-        return redirect(url_for("admin"))
-
-    return render_template("edit_product.html", product=product)
-    
-
-
 
 @app.route("/admin/delete_product/<id>", methods=["POST"])
 def delete_product(id):
@@ -532,116 +588,18 @@ def delete_product(id):
         flash("Error: Base de datos no conectada.", "danger")
         return redirect(url_for("admin"))
     
-    products_collection.delete_one({"_id": ObjectId(id)})
-    flash("Producto eliminado correctamente.", "secondary")
+    try:
+        products_collection.delete_one({"_id": ObjectId(id)})
+        flash("Producto eliminado correctamente.", "secondary")
+    except Exception as e:
+        flash("Error al eliminar producto.", "danger")
+    
     return redirect(url_for("admin"))
 
 if __name__ == "__main__":
     # Crear directorio de uploads si no existe
     if not os.path.exists(UPLOAD_FOLDER):
         os.makedirs(UPLOAD_FOLDER)
-
-from PIL import Image, ImageDraw, ImageFont
-
-def crear_imagen_placeholder(nombre_producto, filename, width=300, height=250):
-    """Crea una imagen placeholder bonita para productos"""
-    try:
-        # Crear imagen con gradiente atractivo
-        img = Image.new('RGB', (width, height), color='#667eea')
-        draw = ImageDraw.Draw(img)
-        
-        # Dibujar círculo decorativo
-        draw.ellipse([-50, -50, 150, 150], fill='#764ba2', outline=None)
-        draw.ellipse([200, 150, 350, 300], fill='#764ba2', outline=None)
-        
-        # Texto del producto (dividido en líneas si es muy largo)
-        palabras = nombre_producto.split()
-        line1 = ' '.join(palabras[:len(palabras)//2]) if len(palabras) > 2 else nombre_producto[:15]
-        line2 = ' '.join(palabras[len(palabras)//2:]) if len(palabras) > 2 else nombre_producto[15:30] if len(nombre_producto) > 15 else ''
-        
-        # Intentar usar una fuente, sino usar default
-        try:
-            font_large = ImageFont.truetype("arial.ttf", 20)
-            font_small = ImageFont.truetype("arial.ttf", 16)
-        except:
-            font_large = ImageFont.load_default()
-            font_small = ImageFont.load_default()
-        
-        # Dibujar texto
-        if line2:
-            draw.text((width//2, height//2 - 15), line1, fill='white', font=font_large, anchor='mm')
-            draw.text((width//2, height//2 + 15), line2, fill='white', font=font_small, anchor='mm')
-        else:
-            draw.text((width//2, height//2), line1, fill='white', font=font_large, anchor='mm')
-        
-        # Guardar imagen
-        images_dir = 'static/images'
-        if not os.path.exists(images_dir):
-            os.makedirs(images_dir)
-        
-        path = os.path.join(images_dir, filename)
-        
-        # Determinar formato basado en extensión
-        if filename.lower().endswith('.webp'):
-            img.save(path, 'WEBP', quality=85)
-        elif filename.lower().endswith('.avif'):
-            img.save(path, 'JPEG', quality=85)  # PIL no soporta AVIF, usamos JPEG
-        else:
-            img.save(path, 'JPEG', quality=85)
-            
-        print(f"✅ Imagen creada: {filename}")
-        return True
-    except Exception as e:
-        print(f"❌ Error creando {filename}: {e}")
-        return False
-
-def inicializar_imagenes_productos():
-    """Crea imágenes para todos los productos de ejemplo"""
-    print("🖼️ Inicializando imágenes de productos...")
     
-    # Lista de imágenes que necesitas basada en tus productos
-    imagenes_necesarias = [
-        "base de maquillaje.avif",
-        "Paleta de Sombras.webp", 
-        "Labial Líquido Mate.webp",
-        "Máscara de Pestañas.webp",
-        "Shampoo Nutritivo.webp",
-        "Acondicionador Reparador.jpg",
-        "Crema para Peinar.jpg", 
-        "Aceite Capilar.jpg",
-        "Limpiador Facial.jpg",
-        "Crema Hidratante.jpg",
-        "Serum Vitamina C.jpg",
-        "Mascarilla Facial.jpg"
-    ]
-    
-    # Mapeo de nombres de archivo a nombres de producto
-    mapeo_nombres = {
-        "base de maquillaje.avif": "Base Maquillaje",
-        "Paleta de Sombras.webp": "Paleta Sombras",
-        "Labial Líquido Mate.webp": "Labial Mate", 
-        "Máscara de Pestañas.webp": "Máscara Pestañas",
-        "Shampoo Nutritivo.webp": "Shampoo Nutritivo",
-        "Acondicionador Reparador.jpg": "Acondicionador",
-        "Crema para Peinar.jpg": "Crema Peinar",
-        "Aceite Capilar.jpg": "Aceite Capilar",
-        "Limpiador Facial.jpg": "Limpiador Facial",
-        "Crema Hidratante.jpg": "Crema Hidratante",
-        "Serum Vitamina C.jpg": "Serum Vitamina C",
-        "Mascarilla Facial.jpg": "Mascarilla Facial"
-    }
-    
-    creadas = 0
-    for imagen in imagenes_necesarias:
-        if not os.path.exists(os.path.join('static/images', imagen)):
-            nombre_producto = mapeo_nombres.get(imagen, imagen.replace('.', ' ').title())
-            if crear_imagen_placeholder(nombre_producto, imagen):
-                creadas += 1
-    
-    print(f"📸 Se crearon {creadas} imágenes placeholder")
-    return creadas
-
-# Llamar esta función después de definir sample_products pero antes de las rutas
-inicializar_imagenes_productos()
-    
-app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(debug=False, host='0.0.0.0', port=port)
