@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify
+from flask import Flask, render_template, request, redirect, url_for, flash, session, jsonify, send_from_directory
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 import os
@@ -57,9 +57,9 @@ def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-@app.route('/uploads/<filename>')
-def uploaded_file(filename):
-    return send_from_directory(app.config['UPLOAD_FOLDER'], filename)
+@app.route('/static/img/<path:filename>')
+def serve_images(filename):
+    return send_from_directory('static/img', filename)
 
 # Datos de productos de ejemplo CON IMÁGENES
 sample_products = [
@@ -534,6 +534,7 @@ if __name__ == "__main__":
         os.makedirs(UPLOAD_FOLDER)
     
     app.run(debug=True)
+
 
 
 
