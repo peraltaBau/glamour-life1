@@ -36,8 +36,8 @@
             {% for product in products %}
             <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
                 <div class="card product-card h-100">
-                    {% if product.image %}
-                    <img src="{{ url_for('static', filename='uploads/' + product.image) }}" 
+                    {% if product.img %}
+                    <img src="{{ url_for('static', filename='uploads/' + product.img) }}" 
                          class="card-img-top product-image" alt="{{ product.name }}">
                     {% else %}
                     <img src="https://via.placeholder.com/300x200?text=Sin+Imagen" 
@@ -57,13 +57,13 @@
     <div class="col-md-4 mb-4">
         <div class="card h-100">
             <!-- Imagen del producto -->
-            {% if product.image %}
-            <img src="{{ url_for('uploaded_file', filename=product.image) }}" 
+            {% if product.img %}
+            <img src="{{ url_for('uploaded_file', filename=product.img) }}" 
                  class="card-img-top" 
                  alt="{{ product.name }}"
                  style="height: 200px; object-fit: cover;">
             {% else %}
-            <img src="{{ url_for('static', filename='images/default_product.jpg') }}" 
+            <img src="{{ url_for('static', filename='img/default_product.jpg') }}" 
                  class="card-img-top" 
                  alt="Imagen no disponible"
                  style="height: 200px; object-fit: cover;">
@@ -119,3 +119,4 @@
 </div>
 {% endif %}
 {% endblock %}
+
