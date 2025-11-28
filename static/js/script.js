@@ -85,4 +85,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const tooltipList = tooltipTriggerList.map(function(tooltipTriggerEl) {
         return new bootstrap.Tooltip(tooltipTriggerEl);
     });
+
+});
+
+function filterProducts(category) {
+    const productos = document.querySelectorAll('.producto-card');
+    const botones = document.querySelectorAll('.btn-filtro');
+    
+    // Actualizar botones activos
+    botones.forEach(btn => btn.classList.remove('active'));
+    event.target.classList.add('active');
+    
+    // Filtrar productos
+    productos.forEach(producto => {
+        if (category === 'all' || producto.dataset.category === category) {
+            producto.style.display = 'block';
+        } else {
+            producto.style.display = 'none';
+        }
+    });
+}
+
+// Efectos de carga
+document.addEventListener('DOMContentLoaded', function() {
+    const productos = document.querySelectorAll('.producto-card');
+    productos.forEach((producto, index) => {
+        producto.style.animationDelay = `${index * 0.1}s`;
+        producto.classList.add('fade-in');
+    });
 });
